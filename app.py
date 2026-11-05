@@ -4,11 +4,11 @@ from google import genai
 
 # Ρύθμιση τίτλου και εμφάνισης σελίδας
 st.set_page_config(page_title="Σωκρατικός Βοηθός Python (ΕΠΑΛ)", layout="centered")
-# --- ΠΡΟΣΘΗΚΗ ΓΙΑ COURIER NEW ΚΑΙ ΚΑΛΥΤΕΡΗ ΣΤΟΙΧΙΣΗ ΚΩΔΙΚΑ ---
+# --- ΠΡΟΣΘΗΚΗ ΜΟΝΟ ΓΙΑ ΤΟΝ ΚΩΔΙΚΑ ΣΕ COURIER NEW ---
 st.markdown("""
     <style>
-    /* Εφαρμογή Courier New σε όλο το περιεχόμενο του chat και στα πεδία εισαγωγής */
-    .stChatMessage, .stChatInput textarea, div[data-testid="stMarkdownContainer"] p, code, pre {
+    /* Εφαρμογή Courier New ΑΠΟΚΛΕΙΣΤΙΚΑ στα blocks κώδικα και στις εντολές */
+    code, pre {
         font-family: 'Courier New', Courier, monospace !important;
     }
     </style>
