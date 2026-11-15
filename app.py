@@ -77,7 +77,7 @@ if prompt := st.chat_input("Γράψε την ερώτηση ή τον κώδι�
 #        role_label = "Μαθητής" if msg["role"] == "user" else "Καθηγητής"
 #        full_prompt += f"{role_label}: {msg['content']}\n"
 #    full_prompt += "Καθηγητής:"
-///
+
     # Κρατάμε τις τελευταίες 6 ανταλλαγές μηνυμάτων
     recent_messages = st.session_state.messages[-6:]
 
