@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 from google import genai
+from google.genai import types
 
 # Ρύθμιση τίτλου και εμφάνισης σελίδας
 st.set_page_config(page_title="Σωκρατικός Βοηθός Python (ΕΠΑΛ)", layout="centered")
@@ -69,22 +70,56 @@ if prompt := st.chat_input("Γράψε την ερώτηση ή τον κώδι�
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
+#Αρχική σύνθεση και αλλαγή για οικονομία
+#    # Σύνθεση του πλήρους prompt με το System Prompt και το ιστορικό
+#    full_prompt = f"{SYSTEM_PROMPT}\n\n"
+#    for msg in st.session_state.messages:
+#        role_label = "Μαθητής" if msg["role"] == "user" else "Καθηγητής"
+#        full_prompt += f"{role_label}: {msg['content']}\n"
+#    full_prompt += "Καθηγητής:"
+///
+    # Κρατάμε τις τελευταίες 6 ανταλλαγές μηνυμάτων
+    recent_messages = st.session_state.messages[-6:]
 
-    # Σύνθεση του πλήρους prompt με το System Prompt και το ιστορικό
-    full_prompt = f"{SYSTEM_PROMPT}\n\n"
-    for msg in st.session_state.messages:
+    full_prompt = ""
+
+    for msg in recent_messages:
         role_label = "Μαθητής" if msg["role"] == "user" else "Καθηγητής"
         full_prompt += f"{role_label}: {msg['content']}\n"
-    full_prompt += "Καθηγητής:"
 
+    full_prompt += "Καθηγητής:"
+    
     # Κλήση στο API του Gemini
     with st.chat_message("assistant"):
         with st.spinner("Ο καθηγητής σκέφτεται..."):
             try:
-                response = client.models.generate_content(
-                    model="models/gemini-3.6-flash",
-                    contents=full_prompt
-                )
+               response = client.models.generate_content(
+                      model="models/gemini-3.6-flash",
+                      contents=full_prompt,
+                      config=types.GenerateContentConfig(
+                         system_instruction=SYSTEM_PROMPT,
+                         thinking_config=types.ThinkingConfig(
+                            thinking_level="low"
+                         )
+                      )
+                )                
+
+                # Καταγραφή πραγματικής κατανάλωσης
+                usage = response.usage_metadata
+
+                if usage:
+                   st.caption(
+                        f"Input: {usage.prompt_token_count} | "
+                        f"Output: {usage.candidates_token_count} | "
+                        f"Thinking: {usage.thoughts_token_count or 0} | "
+                        f"Cached: {usage.cached_content_token_count or 0}"
+                   )
+#Παλιό client model                
+#                response = client.models.generate_content(
+#                    model="models/gemini-3.6-flash",
+#                    contents=full_prompt
+#                )
+                
                 bot_response = response.text
                 st.markdown(bot_response)
                 st.session_state.messages.append({"role": "assistant", "content": bot_response})
