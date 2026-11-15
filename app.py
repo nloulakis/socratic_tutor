@@ -92,36 +92,41 @@ if prompt := st.chat_input("Γράψε την ερώτηση ή τον κώδι�
     # Κλήση στο API του Gemini
     with st.chat_message("assistant"):
         with st.spinner("Ο καθηγητής σκέφτεται..."):
+
             try:
-               response = client.models.generate_content(
-                      model="models/gemini-3.6-flash",
-                      contents=full_prompt,
-                      config=types.GenerateContentConfig(
-                         system_instruction=SYSTEM_PROMPT,
-                         thinking_config=types.ThinkingConfig(
+                response = client.models.generate_content(
+                    model="models/gemini-3.6-flash",
+                    contents=full_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_PROMPT,
+                        thinking_config=types.ThinkingConfig(
                             thinking_level="low"
-                         )
-                      )
-                )                
+                        )
+                    )
+                )
 
-                # Καταγραφή πραγματικής κατανάλωσης
                 usage = response.usage_metadata
-
                 if usage:
-                   st.caption(
+                    st.caption(
                         f"Input: {usage.prompt_token_count} | "
                         f"Output: {usage.candidates_token_count} | "
                         f"Thinking: {usage.thoughts_token_count or 0} | "
                         f"Cached: {usage.cached_content_token_count or 0}"
-                   )
+                    )
+
+                bot_response = response.text
+                st.markdown(bot_response)
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": bot_response
+                })
+
+            except Exception as e:
+                st.error(f"Προέκυψε σφάλμα κατά την επικοινωνία: {e}")
+
 #Παλιό client model                
 #                response = client.models.generate_content(
 #                    model="models/gemini-3.6-flash",
 #                    contents=full_prompt
 #                )
                 
-                bot_response = response.text
-                st.markdown(bot_response)
-                st.session_state.messages.append({"role": "assistant", "content": bot_response})
-            except Exception as e:
-                st.error(f"Προέκυψε σφάλμα κατά την επικοινωνία: {e}")
